@@ -53,6 +53,11 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ i
   const isOwner = user?.id === prompt.user_id
   const profile = prompt.profiles as any
 
+  // Fire-and-forget — don't block render, don't count owner views
+  if (!isOwner) {
+    supabase.rpc('increment_view_count', { prompt_id: id }).then(() => {})
+  }
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="flex items-center gap-2">

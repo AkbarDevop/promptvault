@@ -193,7 +193,17 @@ CREATE POLICY "bookmarks: user can delete own"
   ON public.bookmarks FOR DELETE TO authenticated
   USING ((SELECT auth.uid()) = user_id);
 
--- 9. Storage bucket policies (run after creating 'avatars' bucket in dashboard)
+-- 9. View count RPC (SECURITY DEFINER bypasses RLS so any visitor can increment)
+CREATE OR REPLACE FUNCTION public.increment_view_count(prompt_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE public.prompts
+  SET view_count = view_count + 1
+  WHERE id = prompt_id AND is_public = TRUE;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 10. Storage bucket policies (run after creating 'avatars' bucket in dashboard)
 CREATE POLICY "avatars: authenticated can upload own"
   ON storage.objects FOR INSERT TO authenticated
   WITH CHECK (bucket_id = 'avatars' AND (SELECT auth.uid())::text = SPLIT_PART(name, '/', 1));
