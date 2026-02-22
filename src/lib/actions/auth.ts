@@ -7,8 +7,8 @@ import { loginSchema, signupSchema } from '@/lib/validations/schemas'
 import type { FormState } from '@/types/database'
 
 async function getSiteUrl() {
-  // Prefer explicit env var (set in Netlify/Vercel) to avoid deploy-preview URLs
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
+  // SITE_URL is a server-only env var — always read at runtime, never baked in at build time
+  if (process.env.SITE_URL) return process.env.SITE_URL
   const headersList = await headers()
   const host = headersList.get('x-forwarded-host') ?? headersList.get('host') ?? 'localhost:3000'
   const proto = headersList.get('x-forwarded-proto') ?? 'http'
