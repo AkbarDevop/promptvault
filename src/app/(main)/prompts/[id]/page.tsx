@@ -11,6 +11,7 @@ import { LikeButton } from '@/components/prompt/like-button'
 import { BookmarkButton } from '@/components/prompt/bookmark-button'
 import { TagBadge } from '@/components/prompt/tag-badge'
 import { DeletePromptButton } from '@/components/prompt/delete-prompt-button'
+import { CopyButton } from '@/components/prompt/copy-button'
 import { ArrowLeft, Pencil } from 'lucide-react'
 import type { Metadata } from 'next'
 
@@ -94,8 +95,11 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ i
 
         <Separator />
 
-        <div className="rounded-lg border bg-muted/30 p-4">
-          <p className="whitespace-pre-wrap font-mono text-sm leading-relaxed">{prompt.content}</p>
+        <div className="rounded-lg border bg-muted/30 p-4 relative">
+          <div className="absolute top-2 right-2">
+            <CopyButton text={prompt.content} />
+          </div>
+          <p className="whitespace-pre-wrap font-mono text-sm leading-relaxed pr-20">{prompt.content}</p>
         </div>
 
         <div className="flex items-center justify-between">

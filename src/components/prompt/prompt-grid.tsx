@@ -1,4 +1,5 @@
 import { PromptCard } from '@/components/prompt/prompt-card'
+import { Sparkles } from 'lucide-react'
 import type { PromptWithProfile } from '@/types/database'
 
 interface PromptGridProps {
@@ -18,8 +19,12 @@ export function PromptGrid({
 }: PromptGridProps) {
   if (prompts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <p className="text-muted-foreground">{emptyMessage}</p>
+      <div className="flex flex-col items-center justify-center py-24 text-center gap-3">
+        <div className="rounded-full bg-muted p-4">
+          <Sparkles className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <p className="font-medium">Nothing here yet</p>
+        <p className="text-sm text-muted-foreground max-w-xs">{emptyMessage}</p>
       </div>
     )
   }

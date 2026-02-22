@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { LikeButton } from '@/components/prompt/like-button'
 import { BookmarkButton } from '@/components/prompt/bookmark-button'
 import { TagBadge } from '@/components/prompt/tag-badge'
+import { CopyButton } from '@/components/prompt/copy-button'
 import type { PromptWithProfile } from '@/types/database'
 
 const MODEL_LABELS: Record<string, string> = {
@@ -47,10 +48,13 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
       </CardHeader>
 
       <CardContent className="pb-3 flex-1">
-        <div className="rounded-md bg-muted/50 p-3">
+        <div className="rounded-md bg-muted/50 p-3 relative group/content">
           <p className="text-sm font-mono leading-relaxed line-clamp-4 whitespace-pre-wrap">
             {prompt.content}
           </p>
+          <div className="absolute top-1 right-1 opacity-0 group-hover/content:opacity-100 transition-opacity">
+            <CopyButton text={prompt.content} />
+          </div>
         </div>
         {prompt.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-3">
