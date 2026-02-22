@@ -1,0 +1,24 @@
+import Link from 'next/link'
+import { LoginForm } from '@/components/auth/login-form'
+
+export const metadata = { title: 'Sign in — PromptVault' }
+
+export default function LoginPage() {
+  return (
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">Welcome back</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Sign in to your PromptVault account</p>
+        </div>
+        <LoginForm />
+        <p className="text-center text-sm text-muted-foreground">
+          Don&apos;t have an account?{' '}
+          <Link href="/signup" className="font-medium underline underline-offset-4 hover:text-primary">
+            Sign up
+          </Link>
+        </p>
+      </div>
+    </div>
+  )
+}
