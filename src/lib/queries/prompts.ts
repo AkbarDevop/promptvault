@@ -4,7 +4,7 @@ import type { PromptWithProfile } from '@/types/database'
 // Supabase requires the explicit FK hint because prompts has multiple
 // relationships to profiles (direct, via likes, via bookmarks)
 const PROMPT_WITH_PROFILE = `
-  id, title, description, model, category, tags,
+  id, title, content, description, model, category, tags,
   like_count, bookmark_count, created_at,
   profiles!prompts_user_id_fkey(username, display_name, avatar_url)
 ` as const

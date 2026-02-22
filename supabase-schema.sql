@@ -196,7 +196,14 @@ CREATE POLICY "bookmarks: user can delete own"
 -- 9. Storage bucket policies (run after creating 'avatars' bucket in dashboard)
 CREATE POLICY "avatars: authenticated can upload own"
   ON storage.objects FOR INSERT TO authenticated
-  WITH CHECK (bucket_id = 'avatars' AND (SELECT auth.uid())::text = (SPLIT_PART(name, '/', 1)));
+  WITH CHECK (bucket_id = 'avatars' AND (SELECT auth.uid())::text = SPLIT_PART(name, '/', 1));
+CREATE POLICY "avatars: authenticated can update own"
+  ON storage.objects FOR UPDATE TO authenticated
+  USING (bucket_id = 'avatars' AND (SELECT auth.uid())::text = SPLIT_PART(name, '/', 1))
+  WITH CHECK (bucket_id = 'avatars' AND (SELECT auth.uid())::text = SPLIT_PART(name, '/', 1));
+CREATE POLICY "avatars: authenticated can delete own"
+  ON storage.objects FOR DELETE TO authenticated
+  USING (bucket_id = 'avatars' AND (SELECT auth.uid())::text = SPLIT_PART(name, '/', 1));
 CREATE POLICY "avatars: anyone can read"
   ON storage.objects FOR SELECT TO anon, authenticated
   USING (bucket_id = 'avatars');

@@ -31,7 +31,16 @@ export const promptSchema = z.object({
 export const profileSchema = z.object({
   display_name: z.string().min(1, 'Display name is required').max(50, 'Display name must be at most 50 characters'),
   bio: z.string().max(300, 'Bio must be at most 300 characters').optional(),
-  website_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  website_url: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (!val || val.trim() === '') return ''
+      const trimmed = val.trim()
+      if (/^https?:\/\//i.test(trimmed)) return trimmed
+      return `https://${trimmed}`
+    })
+    .pipe(z.string().url('Must be a valid URL').or(z.literal(''))),
 })
 
 export type LoginFormData = z.infer<typeof loginSchema>

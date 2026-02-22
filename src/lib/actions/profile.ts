@@ -49,26 +49,28 @@ export async function uploadAvatar(formData: FormData) {
 
   const file = formData.get('avatar') as File
   if (!file || file.size === 0) return { error: 'No file selected' }
-  if (file.size > 2 * 1024 * 1024) return { error: 'File must be under 2MB' }
+  if (file.size > 5 * 1024 * 1024) return { error: 'File must be under 5MB' }
 
   const ext = file.name.split('.').pop()
   const path = `${user.id}/avatar.${ext}`
 
   const { error: uploadError } = await supabase.storage
     .from('avatars')
-    .upload(path, file, { upsert: true })
+    .upload(path, file, { upsert: true, contentType: file.type })
 
   if (uploadError) return { error: uploadError.message }
 
+  // Append cache-bust timestamp so the browser fetches the new image
   const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+  const bustUrl = `${publicUrl}?t=${Date.now()}`
 
   const { error: updateError } = await supabase
     .from('profiles')
-    .update({ avatar_url: publicUrl })
+    .update({ avatar_url: bustUrl })
     .eq('id', user.id)
 
   if (updateError) return { error: updateError.message }
 
   revalidatePath('/profile/settings')
-  return { success: 'Avatar updated.' }
+  return { success: 'Avatar updated.', url: bustUrl }
 }

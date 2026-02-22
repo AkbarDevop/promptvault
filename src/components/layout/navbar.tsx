@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { signOut } from '@/lib/actions/auth'
+import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { Sparkles, Plus } from 'lucide-react'
 
 type NavProfile = { username: string; display_name: string | null; avatar_url: string | null }
@@ -37,6 +38,7 @@ export async function Navbar() {
         </Link>
 
         <nav className="flex items-center gap-2">
+          <ThemeToggle />
           {user ? (
             <>
               <Button asChild size="sm">
