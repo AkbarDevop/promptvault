@@ -4,6 +4,11 @@
 
 Think of it as Instagram/Dribbble for prompt engineering — a place where the art of asking the right question is celebrated, curated, and learned from.
 
+## Why I Built This
+
+My philosophy is that in the future humans will get credit for how well they interact with AI and how much they can get out of it. I am sure most of you have heard about the importance of asking the right questions, but I want to reframe it as the importance of right prompting. I got inspired to build this first of all for myself, because sometimes I write really good prompts and I do not want them to get lost in the endless loop of chats — I want to save them somewhere meaningful. Second, the recent YC batch application added a question asking founders to share their best chatbot interaction, which I thought was a very smart move, and that made me think even more about how valuable great prompts and conversations actually are. There are many prompt engineering tools out there, but I want to build something with a social layer where everyone can store their best prompts or chatbot conversations like memorials, almost like chefs sharing their personal recipes or like writing reflections the way Amir Temur or Marcus Aurelius documented their thoughts, keeping the style, tone, and everything intact but making it shareable and timeless.
+
+
 ## Features
 
 - Share prompts from ChatGPT, Claude, Gemini, Grok, and more
