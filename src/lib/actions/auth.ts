@@ -1,9 +1,17 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { loginSchema, signupSchema } from '@/lib/validations/schemas'
 import type { FormState } from '@/types/database'
+
+async function getSiteUrl() {
+  const headersList = await headers()
+  const host = headersList.get('host') ?? 'localhost:3000'
+  const proto = headersList.get('x-forwarded-proto') ?? 'http'
+  return `${proto}://${host}`
+}
 
 export async function signIn(_prevState: FormState, formData: FormData): Promise<FormState> {
   const raw = {
@@ -72,11 +80,12 @@ export async function signOut() {
 }
 
 export async function signInWithGoogle(): Promise<void> {
+  const siteUrl = await getSiteUrl()
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/callback`,
+      redirectTo: `${siteUrl}/callback`,
     },
   })
 
