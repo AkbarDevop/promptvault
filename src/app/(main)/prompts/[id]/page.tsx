@@ -12,7 +12,8 @@ import { BookmarkButton } from '@/components/prompt/bookmark-button'
 import { TagBadge } from '@/components/prompt/tag-badge'
 import { DeletePromptButton } from '@/components/prompt/delete-prompt-button'
 import { CopyButton } from '@/components/prompt/copy-button'
-import { ArrowLeft, Pencil } from 'lucide-react'
+import { ShareButton } from '@/components/prompt/share-button'
+import { ArrowLeft, Pencil, Eye } from 'lucide-react'
 import type { Metadata } from 'next'
 
 const MODEL_LABELS: Record<string, string> = {
@@ -121,6 +122,13 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ i
           </Link>
 
           <div className="flex items-center gap-1">
+            {prompt.view_count > 0 && (
+              <span className="flex items-center gap-1 px-2 text-xs text-muted-foreground">
+                <Eye className="h-3.5 w-3.5" />
+                {prompt.view_count.toLocaleString()}
+              </span>
+            )}
+            <ShareButton promptId={prompt.id} />
             <LikeButton
               promptId={prompt.id}
               initialLiked={likes.has(prompt.id)}
