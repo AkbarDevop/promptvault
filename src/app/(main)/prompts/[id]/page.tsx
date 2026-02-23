@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { createClient } from '@/lib/supabase/server'
 import { getPromptById, getUserInteractions } from '@/lib/queries/prompts'
+import { getComments } from '@/lib/queries/comments'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -14,6 +15,7 @@ import { DeletePromptButton } from '@/components/prompt/delete-prompt-button'
 import { CopyButton } from '@/components/prompt/copy-button'
 import { ShareButton } from '@/components/prompt/share-button'
 import { PromptVariables } from '@/components/prompt/prompt-variables'
+import { CommentSection } from '@/components/prompt/comment-section'
 import { ArrowLeft, Pencil, Eye } from 'lucide-react'
 import type { Metadata } from 'next'
 
@@ -61,9 +63,12 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ i
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { likes, bookmarks } = user
-    ? await getUserInteractions(user.id, [prompt.id])
-    : { likes: new Set<string>(), bookmarks: new Set<string>() }
+  const [{ likes, bookmarks }, comments] = await Promise.all([
+    user
+      ? getUserInteractions(user.id, [prompt.id])
+      : Promise.resolve({ likes: new Set<string>(), bookmarks: new Set<string>() }),
+    getComments(prompt.id),
+  ])
 
   const isOwner = user?.id === prompt.user_id
   const profile = prompt.profiles
@@ -164,6 +169,13 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ i
             />
           </div>
         </div>
+
+        <CommentSection
+          promptId={prompt.id}
+          initialComments={comments}
+          currentUserId={user?.id}
+          isAuthenticated={!!user}
+        />
       </div>
     </div>
   )

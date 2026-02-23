@@ -266,6 +266,41 @@ export interface Database {
           }
         ]
       }
+      comments: {
+        Row: {
+          id: string
+          prompt_id: string
+          user_id: string
+          content: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          prompt_id: string
+          user_id: string
+          content: string
+          created_at?: string
+        }
+        Update: {
+          content?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'comments_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'comments_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -294,6 +329,7 @@ export type Prompt = Database['public']['Tables']['prompts']['Row']
 export type Like = Database['public']['Tables']['likes']['Row']
 export type Bookmark = Database['public']['Tables']['bookmarks']['Row']
 export type Follow = Database['public']['Tables']['follows']['Row']
+export type Comment = Database['public']['Tables']['comments']['Row']
 export type Notification = Database['public']['Tables']['notifications']['Row']
 export type ProfilePreview = Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
 
