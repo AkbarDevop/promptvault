@@ -6,6 +6,18 @@ import { createClient } from '@/lib/supabase/server'
 import { promptSchema } from '@/lib/validations/schemas'
 import type { FormState } from '@/types/database'
 
+function isMissingRichPromptColumnsError(message?: string) {
+  if (!message) return false
+  return message.includes('usage_tips') || message.includes('example_output')
+}
+
+function stripRichPromptFields<T extends Record<string, unknown>>(payload: T) {
+  const legacyPayload = { ...payload }
+  delete legacyPayload.usage_tips
+  delete legacyPayload.example_output
+  return legacyPayload
+}
+
 export async function createPrompt(_prevState: FormState, formData: FormData): Promise<FormState> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -39,13 +51,26 @@ export async function createPrompt(_prevState: FormState, formData: FormData): P
     example_output: parsed.data.example_output?.trim() ? parsed.data.example_output : null,
   }
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from('prompts')
     .insert({ ...payload, user_id: user.id })
     .select('id')
     .single()
 
-  if (error) return { error: { _form: [error.message] } }
+  // Backward compatibility for environments where DB migration for rich fields has not run yet.
+  if (error && isMissingRichPromptColumnsError(error.message)) {
+    const legacyPayload = stripRichPromptFields(payload)
+    const retry = await supabase
+      .from('prompts')
+      .insert({ ...legacyPayload, user_id: user.id })
+      .select('id')
+      .single()
+
+    data = retry.data
+    error = retry.error
+  }
+
+  if (error || !data) return { error: { _form: [error?.message ?? 'Failed to create prompt'] } }
 
   revalidatePath('/feed')
   redirect(`/prompts/${data.id}`)
@@ -84,11 +109,22 @@ export async function updatePrompt(id: string, _prevState: FormState, formData: 
     example_output: parsed.data.example_output?.trim() ? parsed.data.example_output : null,
   }
 
-  const { error } = await supabase
+  let { error } = await supabase
     .from('prompts')
     .update(payload)
     .eq('id', id)
     .eq('user_id', user.id)
+
+  if (error && isMissingRichPromptColumnsError(error.message)) {
+    const legacyPayload = stripRichPromptFields(payload)
+    const retry = await supabase
+      .from('prompts')
+      .update(legacyPayload)
+      .eq('id', id)
+      .eq('user_id', user.id)
+
+    error = retry.error
+  }
 
   if (error) return { error: { _form: [error.message] } }
 
