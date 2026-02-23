@@ -124,7 +124,7 @@ export async function getMyPrompts(userId: string): Promise<PromptWithProfile[]>
   return (data ?? []) as unknown as PromptWithProfile[]
 }
 
-export async function searchPrompts(query: string, category?: string): Promise<PromptWithProfile[]> {
+export async function searchPrompts(query: string, category?: string, tag?: string): Promise<PromptWithProfile[]> {
   const supabase = await createClient()
 
   let dbQuery = supabase
@@ -140,6 +140,10 @@ export async function searchPrompts(query: string, category?: string): Promise<P
 
   if (category && category !== 'all' && isPromptCategory(category)) {
     dbQuery = dbQuery.eq('category', category)
+  }
+
+  if (tag) {
+    dbQuery = dbQuery.contains('tags', [tag])
   }
 
   const { data, error } = await dbQuery

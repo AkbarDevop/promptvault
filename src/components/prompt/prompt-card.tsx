@@ -36,6 +36,28 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
       <Link href={`/prompts/${prompt.id}`} className="absolute inset-0 z-0" aria-label={prompt.title} />
 
       <CardHeader className="pb-3">
+        {/* Author row — top of card, prominent */}
+        <Link
+          href={`/profile/${profile.username}`}
+          className="flex items-center gap-2.5 group/author relative z-10 mb-3"
+        >
+          <Avatar className="h-8 w-8 ring-2 ring-background">
+            <AvatarImage src={profile.avatar_url ?? undefined} />
+            <AvatarFallback className="text-xs font-semibold">
+              {(profile.display_name ?? profile.username ?? 'U')[0].toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col min-w-0">
+            <span className="text-sm font-semibold leading-tight truncate group-hover/author:text-primary transition-colors">
+              {profile.display_name ?? profile.username}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {formatDistanceToNow(new Date(prompt.created_at), { addSuffix: true })}
+            </span>
+          </div>
+        </Link>
+
+        {/* Title + badges */}
         <div className="flex items-start justify-between gap-2">
           <h2 className="font-semibold leading-snug group-hover/card:text-primary transition-colors line-clamp-2 flex-1">
             {prompt.title}
@@ -52,6 +74,7 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
             </Badge>
           </div>
         </div>
+
         {prompt.description && (
           <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{prompt.description}</p>
         )}
@@ -75,23 +98,7 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
         )}
       </CardContent>
 
-      <CardFooter className="pt-0 flex items-center justify-between">
-        <Link href={`/profile/${profile.username}`} className="flex items-center gap-2 group/author relative z-10">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src={profile.avatar_url ?? undefined} />
-            <AvatarFallback className="text-xs">
-              {(profile.display_name ?? profile.username ?? 'U')[0].toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <span className="text-xs text-muted-foreground group-hover/author:text-foreground transition-colors">
-            {profile.display_name ?? profile.username}
-          </span>
-          <span className="text-xs text-muted-foreground">·</span>
-          <span className="text-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(prompt.created_at), { addSuffix: true })}
-          </span>
-        </Link>
-
+      <CardFooter className="pt-0 flex items-center justify-end">
         <div className="flex items-center relative z-10">
           <LikeButton
             promptId={prompt.id}

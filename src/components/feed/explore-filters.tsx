@@ -3,16 +3,17 @@
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { useEffect, useRef, useTransition } from 'react'
 
 interface ExploreFiltersProps {
   categories: string[]
   currentCategory?: string
   currentQuery?: string
+  currentTag?: string
 }
 
-export function ExploreFilters({ categories, currentCategory, currentQuery }: ExploreFiltersProps) {
+export function ExploreFilters({ categories, currentCategory, currentQuery, currentTag }: ExploreFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -39,6 +40,14 @@ export function ExploreFilters({ categories, currentCategory, currentQuery }: Ex
     })
   }
 
+  function clearTag() {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('tag')
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`)
+    })
+  }
+
   return (
     <div className="space-y-4">
       <div className="relative">
@@ -56,6 +65,19 @@ export function ExploreFilters({ categories, currentCategory, currentQuery }: Ex
           }}
         />
       </div>
+
+      {/* Active tag chip */}
+      {currentTag && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Filtering by tag:</span>
+          <Badge variant="secondary" className="gap-1">
+            #{currentTag}
+            <button onClick={clearTag} className="ml-1 hover:text-foreground">
+              <X className="h-3 w-3" />
+            </button>
+          </Badge>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2">
         {categories.map((cat) => {
