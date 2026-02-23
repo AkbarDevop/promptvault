@@ -124,7 +124,19 @@ export async function getMyPrompts(userId: string): Promise<PromptWithProfile[]>
   return (data ?? []) as unknown as PromptWithProfile[]
 }
 
-export async function searchPrompts(query: string, category?: string, tag?: string): Promise<PromptWithProfile[]> {
+const AI_MODELS = ['chatgpt', 'claude', 'gemini', 'grok', 'llama', 'mistral', 'other'] as const
+type AiModelFilter = (typeof AI_MODELS)[number]
+
+function isAiModel(value: string): value is AiModelFilter {
+  return AI_MODELS.includes(value as AiModelFilter)
+}
+
+export async function searchPrompts(
+  query: string,
+  category?: string,
+  tag?: string,
+  model?: string,
+): Promise<PromptWithProfile[]> {
   const supabase = await createClient()
 
   let dbQuery = supabase
@@ -144,6 +156,10 @@ export async function searchPrompts(query: string, category?: string, tag?: stri
 
   if (tag) {
     dbQuery = dbQuery.contains('tags', [tag])
+  }
+
+  if (model && model !== 'all' && isAiModel(model)) {
+    dbQuery = dbQuery.eq('model', model)
   }
 
   const { data, error } = await dbQuery

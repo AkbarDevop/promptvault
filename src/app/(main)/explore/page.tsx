@@ -25,11 +25,11 @@ function ExploreSkeleton() {
   )
 }
 
-async function ExploreResults({ query, category, tag }: { query?: string; category?: string; tag?: string }) {
+async function ExploreResults({ query, category, tag, model }: { query?: string; category?: string; tag?: string; model?: string }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const prompts = await searchPrompts(query ?? '', category, tag)
+  const prompts = await searchPrompts(query ?? '', category, tag, model)
   const promptIds = prompts.map((p) => p.id)
 
   const { likes, bookmarks } = user
@@ -50,25 +50,31 @@ async function ExploreResults({ query, category, tag }: { query?: string; catego
 export default async function ExplorePage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string; tag?: string }>
+  searchParams: Promise<{ q?: string; category?: string; tag?: string; model?: string }>
 }) {
-  const { q, category, tag } = await searchParams
+  const { q, category, tag, model } = await searchParams
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Explore</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Search and filter prompts by category or keyword.
+          Search and filter prompts by category, model, or keyword.
         </p>
       </div>
 
       <Suspense>
-        <ExploreFilters categories={CATEGORIES} currentCategory={category} currentQuery={q} currentTag={tag} />
+        <ExploreFilters
+          categories={CATEGORIES}
+          currentCategory={category}
+          currentQuery={q}
+          currentTag={tag}
+          currentModel={model}
+        />
       </Suspense>
 
       <Suspense fallback={<ExploreSkeleton />}>
-        <ExploreResults query={q} category={category} tag={tag} />
+        <ExploreResults query={q} category={category} tag={tag} model={model} />
       </Suspense>
     </div>
   )
