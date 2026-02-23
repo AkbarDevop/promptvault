@@ -1,7 +1,8 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { useFormStatus } from 'react-dom'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -54,6 +55,12 @@ interface PromptFormProps {
 
 export function PromptForm({ action, prompt }: PromptFormProps) {
   const [state, formAction] = useActionState<FormState, FormData>(action, undefined)
+
+  useEffect(() => {
+    if (state?.error?.['_form']?.[0]) {
+      toast.error(state.error['_form'][0])
+    }
+  }, [state])
 
   return (
     <form action={formAction} className="space-y-6">
