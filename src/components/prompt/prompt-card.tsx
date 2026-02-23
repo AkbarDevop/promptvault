@@ -7,6 +7,7 @@ import { LikeButton } from '@/components/prompt/like-button'
 import { BookmarkButton } from '@/components/prompt/bookmark-button'
 import { TagBadge } from '@/components/prompt/tag-badge'
 import { CopyButton } from '@/components/prompt/copy-button'
+import { Lock } from 'lucide-react'
 import type { PromptWithProfile } from '@/types/database'
 
 const MODEL_LABELS: Record<string, string> = {
@@ -39,9 +40,17 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
           <h2 className="font-semibold leading-snug group-hover/card:text-primary transition-colors line-clamp-2 flex-1">
             {prompt.title}
           </h2>
-          <Badge variant="outline" className="shrink-0 text-xs relative z-10">
-            {MODEL_LABELS[prompt.model] ?? prompt.model}
-          </Badge>
+          <div className="flex shrink-0 gap-1 relative z-10">
+            {prompt.is_public === false && (
+              <Badge variant="secondary" className="text-xs gap-1">
+                <Lock className="h-3 w-3" />
+                Private
+              </Badge>
+            )}
+            <Badge variant="outline" className="text-xs">
+              {MODEL_LABELS[prompt.model] ?? prompt.model}
+            </Badge>
+          </div>
         </div>
         {prompt.description && (
           <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{prompt.description}</p>

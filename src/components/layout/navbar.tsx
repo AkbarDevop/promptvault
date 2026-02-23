@@ -69,6 +69,9 @@ export async function Navbar() {
                     <Link href={`/profile/${profile?.username}`}>Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
+                    <Link href="/my-prompts">My Prompts</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href="/bookmarks">Bookmarks</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>

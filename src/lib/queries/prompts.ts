@@ -86,6 +86,24 @@ export async function getUserPrompts(userId: string): Promise<PromptWithProfile[
   return (data ?? []) as unknown as PromptWithProfile[]
 }
 
+// Returns ALL prompts for the owner (public + private), includes is_public field
+export async function getMyPrompts(userId: string): Promise<PromptWithProfile[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('prompts')
+    .select(`
+      id, title, content, description, model, category, tags,
+      is_public, like_count, bookmark_count, created_at,
+      profiles!prompts_user_id_fkey(username, display_name, avatar_url)
+    `)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return (data ?? []) as unknown as PromptWithProfile[]
+}
+
 export async function searchPrompts(query: string, category?: string): Promise<PromptWithProfile[]> {
   const supabase = await createClient()
 
