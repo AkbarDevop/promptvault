@@ -35,22 +35,41 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
       {/* Invisible full-card link — sits behind all interactive elements */}
       <Link href={`/prompts/${prompt.id}`} className="absolute inset-0 z-0" aria-label={prompt.title} />
 
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 space-y-3">
         <div className="flex items-start justify-between gap-2">
-          <h2 className="font-semibold leading-snug group-hover/card:text-primary transition-colors line-clamp-2 flex-1">
-            {prompt.title}
-          </h2>
+          <Link href={`/profile/${profile.username}`} className="flex items-center gap-2 group/author relative z-10 min-w-0">
+            <Avatar className="h-7 w-7">
+              <AvatarImage src={profile.avatar_url ?? undefined} />
+              <AvatarFallback className="text-xs">
+                {(profile.display_name ?? profile.username ?? 'U')[0].toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="text-sm font-medium truncate group-hover/author:text-primary transition-colors">
+                {profile.display_name ?? profile.username}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {formatDistanceToNow(new Date(prompt.created_at), { addSuffix: true })}
+              </p>
+            </div>
+          </Link>
           <div className="flex shrink-0 gap-1 relative z-10">
+            <Badge variant="outline" className="text-xs">
+              {MODEL_LABELS[prompt.model] ?? prompt.model}
+            </Badge>
             {prompt.is_public === false && (
               <Badge variant="secondary" className="text-xs gap-1">
                 <Lock className="h-3 w-3" />
                 Private
               </Badge>
             )}
-            <Badge variant="outline" className="text-xs">
-              {MODEL_LABELS[prompt.model] ?? prompt.model}
-            </Badge>
           </div>
+        </div>
+
+        <div className="flex items-start justify-between gap-2">
+          <h2 className="font-semibold leading-snug group-hover/card:text-primary transition-colors line-clamp-2 flex-1">
+            {prompt.title}
+          </h2>
         </div>
         {prompt.description && (
           <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{prompt.description}</p>
@@ -75,23 +94,7 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
         )}
       </CardContent>
 
-      <CardFooter className="pt-0 flex items-center justify-between">
-        <Link href={`/profile/${profile.username}`} className="flex items-center gap-2 group/author relative z-10">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src={profile.avatar_url ?? undefined} />
-            <AvatarFallback className="text-xs">
-              {(profile.display_name ?? profile.username ?? 'U')[0].toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <span className="text-xs text-muted-foreground group-hover/author:text-foreground transition-colors">
-            {profile.display_name ?? profile.username}
-          </span>
-          <span className="text-xs text-muted-foreground">·</span>
-          <span className="text-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(prompt.created_at), { addSuffix: true })}
-          </span>
-        </Link>
-
+      <CardFooter className="pt-0 flex items-center justify-end">
         <div className="flex items-center relative z-10">
           <LikeButton
             promptId={prompt.id}

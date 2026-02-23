@@ -124,7 +124,7 @@ export async function getMyPrompts(userId: string): Promise<PromptWithProfile[]>
   return (data ?? []) as unknown as PromptWithProfile[]
 }
 
-export async function searchPrompts(query: string, category?: string): Promise<PromptWithProfile[]> {
+export async function searchPrompts(query: string, category?: string, tag?: string): Promise<PromptWithProfile[]> {
   const supabase = await createClient()
 
   let dbQuery = supabase
@@ -136,6 +136,10 @@ export async function searchPrompts(query: string, category?: string): Promise<P
 
   if (query) {
     dbQuery = dbQuery.textSearch('title', query, { type: 'websearch' })
+  }
+
+  if (tag) {
+    dbQuery = dbQuery.contains('tags', [tag.toLowerCase()])
   }
 
   if (category && category !== 'all' && isPromptCategory(category)) {

@@ -29,6 +29,10 @@ export function ExploreFilters({ categories, currentCategory, currentQuery }: Ex
 
   function setParam(key: string, value: string | undefined) {
     const params = new URLSearchParams(searchParams.toString())
+    if (key === 'q') {
+      // Clicking a tag sets ?tag=...; typing search should switch to ?q=...
+      params.delete('tag')
+    }
     if (value && value !== 'all') {
       params.set(key, value)
     } else {
