@@ -126,7 +126,7 @@ export async function getBookmarkedPrompts(userId: string): Promise<PromptWithPr
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  const rows = (data ?? []) as Array<{ prompts: PromptWithProfile | null }>
+  const rows = (data ?? []) as unknown as Array<{ prompts: PromptWithProfile | null }>
   return rows.flatMap((bookmark) => (bookmark.prompts ? [bookmark.prompts] : []))
 }
 
