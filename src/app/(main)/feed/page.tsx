@@ -30,24 +30,41 @@ function FeedSkeleton() {
 }
 
 async function FeedContent({
-  tab, category, page,
+  tab, category, page, userId,
 }: {
-  tab: string; category?: string; page: number
+  tab: 'latest' | 'trending' | 'following'
+  category?: string
+  page: number
+  userId?: string
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  if (tab === 'following' && !userId) {
+    return (
+      <div className="rounded-lg border p-8 text-center space-y-3">
+        <h2 className="text-lg font-semibold">Sign in to see your Following feed</h2>
+        <p className="text-sm text-muted-foreground">
+          Follow creators you like, then this tab will show their latest prompts.
+        </p>
+        <div className="flex justify-center">
+          <Button asChild>
+            <Link href="/login?next=/feed?tab=following">Sign in</Link>
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   // Fetch all prompts up to current page so Server Component can render them
   const prompts = await getFeedPrompts({
-    tab: tab as 'latest' | 'trending',
+    tab,
     category,
+    viewerId: userId,
     limit: PAGE_SIZE * (page + 1),
     page: 0,
   })
 
   const promptIds = prompts.map((p) => p.id)
-  const { likes, bookmarks } = user
-    ? await getUserInteractions(user.id, promptIds)
+  const { likes, bookmarks } = userId
+    ? await getUserInteractions(userId, promptIds)
     : { likes: new Set<string>(), bookmarks: new Set<string>() }
 
   const hasMore = prompts.length === PAGE_SIZE * (page + 1)
@@ -64,8 +81,12 @@ async function FeedContent({
         prompts={prompts}
         likedIds={likes}
         bookmarkedIds={bookmarks}
-        isAuthenticated={!!user}
-        emptyMessage="No prompts yet. Be the first to share one!"
+        isAuthenticated={!!userId}
+        emptyMessage={
+          tab === 'following'
+            ? 'No prompts from people you follow yet. Follow more creators to personalize your feed.'
+            : 'No prompts yet. Be the first to share one!'
+        }
       />
       {hasMore && (
         <div className="flex justify-center pt-2">
@@ -84,17 +105,27 @@ export default async function FeedPage({
   searchParams: Promise<{ tab?: string; category?: string; page?: string }>
 }) {
   const { tab = 'latest', category, page = '0' } = await searchParams
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const normalizedTab =
+    tab === 'trending' || tab === 'following'
+      ? tab
+      : 'latest'
+
+  const parsedPage = Number.parseInt(page, 10)
+  const safePage = Number.isFinite(parsedPage) && parsedPage >= 0 ? parsedPage : 0
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Discover Prompts</h1>
         <Suspense>
-          <FeedTabs />
+          <FeedTabs isAuthenticated={!!user} />
         </Suspense>
       </div>
       <Suspense fallback={<FeedSkeleton />}>
-        <FeedContent tab={tab} category={category} page={Number(page)} />
+        <FeedContent tab={normalizedTab} category={category} page={safePage} userId={user?.id} />
       </Suspense>
     </div>
   )

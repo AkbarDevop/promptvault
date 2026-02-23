@@ -172,6 +172,39 @@ export interface Database {
           }
         ]
       }
+      follows: {
+        Row: {
+          follower_id: string
+          followed_id: string
+          created_at: string
+        }
+        Insert: {
+          follower_id: string
+          followed_id: string
+          created_at?: string
+        }
+        Update: {
+          follower_id?: string
+          followed_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'follows_follower_id_fkey'
+            columns: ['follower_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'follows_followed_id_fkey'
+            columns: ['followed_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -199,6 +232,7 @@ export type Profile = Database['public']['Tables']['profiles']['Row']
 export type Prompt = Database['public']['Tables']['prompts']['Row']
 export type Like = Database['public']['Tables']['likes']['Row']
 export type Bookmark = Database['public']['Tables']['bookmarks']['Row']
+export type Follow = Database['public']['Tables']['follows']['Row']
 
 export type PromptWithProfile = Prompt & {
   profiles: Pick<Profile, 'username' | 'display_name' | 'avatar_url'>

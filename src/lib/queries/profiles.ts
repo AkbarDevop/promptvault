@@ -26,3 +26,17 @@ export async function getProfileById(id: string): Promise<Profile | null> {
   if (error) return null
   return data as unknown as Profile
 }
+
+export async function getIsFollowing(followerId: string, followedId: string): Promise<boolean> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('follows')
+    .select('followed_id')
+    .eq('follower_id', followerId)
+    .eq('followed_id', followedId)
+    .single()
+
+  if (error) return false
+  return !!data
+}

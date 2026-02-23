@@ -46,3 +46,38 @@ export async function toggleBookmark(promptId: string) {
 
   revalidatePath('/bookmarks')
 }
+
+export async function toggleFollow(followedUserId: string, followedUsername: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Not authenticated' }
+  if (user.id === followedUserId) return { error: 'You cannot follow yourself' }
+
+  const { data: existing } = await supabase
+    .from('follows')
+    .select('followed_id')
+    .eq('follower_id', user.id)
+    .eq('followed_id', followedUserId)
+    .single()
+
+  if (existing) {
+    const { error } = await supabase
+      .from('follows')
+      .delete()
+      .eq('follower_id', user.id)
+      .eq('followed_id', followedUserId)
+
+    if (error) return { error: error.message }
+  } else {
+    const { error } = await supabase
+      .from('follows')
+      .insert({ follower_id: user.id, followed_id: followedUserId })
+
+    if (error) return { error: error.message }
+  }
+
+  revalidatePath('/feed')
+  revalidatePath(`/profile/${followedUsername}`)
+  return { success: true, followed: !existing }
+}

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { getProfileByUsername } from '@/lib/queries/profiles'
+import { getIsFollowing, getProfileByUsername } from '@/lib/queries/profiles'
 import { getUserPrompts, getUserInteractions } from '@/lib/queries/prompts'
 import { ProfileHeader } from '@/components/profile/profile-header'
 import { PromptGrid } from '@/components/prompt/prompt-grid'
@@ -35,10 +35,20 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
     : { likes: new Set<string>(), bookmarks: new Set<string>() }
 
   const isOwner = user?.id === profile.id
+  const isFollowing =
+    user && !isOwner
+      ? await getIsFollowing(user.id, profile.id)
+      : false
 
   return (
     <div className="space-y-6">
-      <ProfileHeader profile={profile} promptCount={prompts.length} isOwner={isOwner} />
+      <ProfileHeader
+        profile={profile}
+        promptCount={prompts.length}
+        isOwner={isOwner}
+        isAuthenticated={!!user}
+        isFollowing={isFollowing}
+      />
       <Separator />
       <PromptGrid
         prompts={prompts}
