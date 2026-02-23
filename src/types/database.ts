@@ -18,6 +18,7 @@ export type PromptCategory =
   | 'creative'
   | 'research'
   | 'other'
+export type NotificationType = 'like' | 'follow'
 
 export interface Database {
   public: {
@@ -211,6 +212,60 @@ export interface Database {
           }
         ]
       }
+      notifications: {
+        Row: {
+          id: string
+          recipient_id: string
+          actor_id: string
+          type: NotificationType
+          prompt_id: string | null
+          is_read: boolean
+          read_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          recipient_id: string
+          actor_id: string
+          type: NotificationType
+          prompt_id?: string | null
+          is_read?: boolean
+          read_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          recipient_id?: string
+          actor_id?: string
+          type?: NotificationType
+          prompt_id?: string | null
+          is_read?: boolean
+          read_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_recipient_id_fkey'
+            columns: ['recipient_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'notifications_actor_id_fkey'
+            columns: ['actor_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'notifications_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts'
+            referencedColumns: ['id']
+          }
+        ]
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -239,6 +294,7 @@ export type Prompt = Database['public']['Tables']['prompts']['Row']
 export type Like = Database['public']['Tables']['likes']['Row']
 export type Bookmark = Database['public']['Tables']['bookmarks']['Row']
 export type Follow = Database['public']['Tables']['follows']['Row']
+export type Notification = Database['public']['Tables']['notifications']['Row']
 export type ProfilePreview = Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
 
 export type PromptWithProfile = Prompt & {
