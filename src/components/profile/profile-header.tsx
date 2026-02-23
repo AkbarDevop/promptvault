@@ -50,6 +50,12 @@ export function ProfileHeader({
         {profile.bio && <p className="text-sm">{profile.bio}</p>}
         <div className="flex items-center gap-4 pt-1">
           <span className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">{profile.follower_count}</span> followers
+          </span>
+          <span className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">{profile.following_count}</span> following
+          </span>
+          <span className="text-sm text-muted-foreground">
             <span className="font-semibold text-foreground">{promptCount}</span> prompts
           </span>
           {profile.website_url && (

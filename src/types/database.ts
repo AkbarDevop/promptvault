@@ -30,6 +30,8 @@ export interface Database {
           bio: string | null
           avatar_url: string | null
           website_url: string | null
+          follower_count: number
+          following_count: number
           created_at: string
           updated_at: string
         }
@@ -40,6 +42,8 @@ export interface Database {
           bio?: string | null
           avatar_url?: string | null
           website_url?: string | null
+          follower_count?: number
+          following_count?: number
           created_at?: string
           updated_at?: string
         }
@@ -49,6 +53,8 @@ export interface Database {
           bio?: string | null
           avatar_url?: string | null
           website_url?: string | null
+          follower_count?: number
+          following_count?: number
           updated_at?: string
         }
         Relationships: []
