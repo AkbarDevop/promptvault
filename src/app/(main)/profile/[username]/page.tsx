@@ -1,9 +1,16 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { getIsFollowing, getProfileByUsername } from '@/lib/queries/profiles'
+import {
+  getFollowers,
+  getFollowing,
+  getFollowStats,
+  getIsFollowing,
+  getProfileByUsername,
+} from '@/lib/queries/profiles'
 import { getUserPrompts, getUserInteractions } from '@/lib/queries/prompts'
 import { ProfileHeader } from '@/components/profile/profile-header'
+import { FollowListSection } from '@/components/profile/follow-list-section'
 import { PromptGrid } from '@/components/prompt/prompt-grid'
 import { Separator } from '@/components/ui/separator'
 
@@ -26,29 +33,48 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const isOwner = user?.id === profile.id
 
-  const prompts = await getUserPrompts(profile.id)
+  const [prompts, followStats, followers, following, isFollowing] = await Promise.all([
+    getUserPrompts(profile.id),
+    getFollowStats(profile.id),
+    getFollowers(profile.id),
+    getFollowing(profile.id),
+    user && !isOwner ? getIsFollowing(user.id, profile.id) : Promise.resolve(false),
+  ])
   const promptIds = prompts.map((p) => p.id)
 
   const { likes, bookmarks } = user
     ? await getUserInteractions(user.id, promptIds)
     : { likes: new Set<string>(), bookmarks: new Set<string>() }
 
-  const isOwner = user?.id === profile.id
-  const isFollowing =
-    user && !isOwner
-      ? await getIsFollowing(user.id, profile.id)
-      : false
-
   return (
     <div className="space-y-6">
       <ProfileHeader
         profile={profile}
         promptCount={prompts.length}
+        followerCount={followStats.followers}
+        followingCount={followStats.following}
         isOwner={isOwner}
         isAuthenticated={!!user}
         isFollowing={isFollowing}
       />
+      <div className="grid gap-4 md:grid-cols-2">
+        <FollowListSection
+          id="followers"
+          title="Followers"
+          users={followers}
+          count={followStats.followers}
+          emptyMessage={`${isOwner ? 'You have' : 'This user has'} no followers yet.`}
+        />
+        <FollowListSection
+          id="following"
+          title="Following"
+          users={following}
+          count={followStats.following}
+          emptyMessage={`${isOwner ? 'You are' : 'This user is'} not following anyone yet.`}
+        />
+      </div>
       <Separator />
       <PromptGrid
         prompts={prompts}
