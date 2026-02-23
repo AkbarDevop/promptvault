@@ -13,6 +13,7 @@ import { TagBadge } from '@/components/prompt/tag-badge'
 import { DeletePromptButton } from '@/components/prompt/delete-prompt-button'
 import { CopyButton } from '@/components/prompt/copy-button'
 import { ShareButton } from '@/components/prompt/share-button'
+import { PromptVariables } from '@/components/prompt/prompt-variables'
 import { ArrowLeft, Pencil, Eye } from 'lucide-react'
 import type { Metadata } from 'next'
 
@@ -121,6 +122,8 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ i
           </div>
           <p className="whitespace-pre-wrap font-mono text-sm leading-relaxed pr-20">{prompt.content}</p>
         </div>
+
+        <PromptVariables content={prompt.content} />
 
         <div className="flex items-center justify-between">
           <Link href={`/profile/${profile.username}`} className="flex items-center gap-2 group">
