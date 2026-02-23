@@ -118,11 +118,16 @@ export default async function FeedPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Discover Prompts</h1>
-        <Suspense>
-          <FeedTabs isAuthenticated={!!user} />
-        </Suspense>
+      <div className="rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 border border-primary/10">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 className="text-2xl font-bold">Discover Prompts</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Browse the best prompts for Claude, ChatGPT, Gemini &amp; more</p>
+          </div>
+          <Suspense>
+            <FeedTabs isAuthenticated={!!user} />
+          </Suspense>
+        </div>
       </div>
       <Suspense fallback={<FeedSkeleton />}>
         <FeedContent tab={normalizedTab} category={category} page={safePage} userId={user?.id} />

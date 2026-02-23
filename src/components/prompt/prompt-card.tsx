@@ -8,6 +8,7 @@ import { BookmarkButton } from '@/components/prompt/bookmark-button'
 import { TagBadge } from '@/components/prompt/tag-badge'
 import { CopyButton } from '@/components/prompt/copy-button'
 import { Lock } from 'lucide-react'
+import { CATEGORY_META } from '@/lib/category-icons'
 import type { PromptWithProfile } from '@/types/database'
 
 const MODEL_LABELS: Record<string, string> = {
@@ -29,9 +30,10 @@ interface PromptCardProps {
 
 export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: PromptCardProps) {
   const profile = prompt.profiles
+  const categoryMeta = CATEGORY_META[prompt.category as keyof typeof CATEGORY_META]
 
   return (
-    <Card className="flex flex-col hover:shadow-md transition-shadow relative group/card cursor-pointer">
+    <Card className="flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 relative group/card cursor-pointer">
       {/* Invisible full-card link — sits behind all interactive elements */}
       <Link href={`/prompts/${prompt.id}`} className="absolute inset-0 z-0" aria-label={prompt.title} />
 
@@ -67,6 +69,12 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
               <Badge variant="secondary" className="text-xs gap-1">
                 <Lock className="h-3 w-3" />
                 Private
+              </Badge>
+            )}
+            {categoryMeta && (
+              <Badge variant="secondary" className={`text-xs gap-1 ${categoryMeta.color}`}>
+                <categoryMeta.Icon className="h-3 w-3" />
+                {categoryMeta.label}
               </Badge>
             )}
             <Badge variant="outline" className="text-xs">
