@@ -30,7 +30,7 @@ export async function getNotifications(
     .order('created_at', { ascending: false })
     .range(page * limit, (page + 1) * limit - 1)
 
-  if (error) throw error
+  if (error) return []
 
   return (data ?? []) as unknown as NotificationWithRelations[]
 }
@@ -44,6 +44,6 @@ export async function getUnreadNotificationCount(recipientId: string): Promise<n
     .eq('recipient_id', recipientId)
     .eq('is_read', false)
 
-  if (error) throw error
+  if (error) return 0
   return count ?? 0
 }
