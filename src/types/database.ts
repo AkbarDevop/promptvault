@@ -174,7 +174,12 @@ export interface Database {
       }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      increment_view_count: {
+        Args: { prompt_id: string }
+        Returns: undefined
+      }
+    }
     Enums: {
       ai_model: AiModel
       prompt_category: PromptCategory
