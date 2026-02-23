@@ -12,7 +12,8 @@ import {
 import { signOut } from '@/lib/actions/auth'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav'
-import { Sparkles, Plus, Compass, Users } from 'lucide-react'
+import { UnreadNotificationsBadge } from '@/components/notifications/unread-notifications-badge'
+import { Sparkles, Plus, Compass, Users, Bell } from 'lucide-react'
 
 type NavProfile = { username: string; display_name: string | null; avatar_url: string | null }
 
@@ -55,6 +56,13 @@ export async function Navbar() {
             <ThemeToggle />
             {user ? (
               <>
+                <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+                  <Link href="/notifications" className="relative">
+                    <Bell className="mr-1 h-4 w-4" />
+                    Notifications
+                    <UnreadNotificationsBadge className="ml-1 h-4 min-w-4 px-1 text-[9px]" />
+                  </Link>
+                </Button>
                 <Button asChild size="sm" className="hidden sm:inline-flex">
                   <Link href="/prompts/new">
                     <Plus className="mr-1 h-4 w-4" />
@@ -81,6 +89,9 @@ export async function Navbar() {
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/bookmarks">Bookmarks</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/notifications">Notifications</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/profile/settings">Settings</Link>

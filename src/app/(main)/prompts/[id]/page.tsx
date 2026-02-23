@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LikeButton } from '@/components/prompt/like-button'
 import { BookmarkButton } from '@/components/prompt/bookmark-button'
 import { TagBadge } from '@/components/prompt/tag-badge'
@@ -72,6 +73,9 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ i
 
   const isOwner = user?.id === prompt.user_id
   const profile = prompt.profiles
+  const hasTips = !!prompt.usage_tips?.trim()
+  const hasExampleOutput = !!prompt.example_output?.trim()
+  const showRichTabs = hasTips || hasExampleOutput
 
   // Fire-and-forget — don't block render, don't count owner views
   if (!isOwner) {
@@ -115,18 +119,54 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ i
           ))}
         </div>
 
-        {prompt.description && (
-          <p className="text-muted-foreground">{prompt.description}</p>
-        )}
-
         <Separator />
 
-        <div className="rounded-lg border bg-muted/30 p-4 relative">
-          <div className="absolute top-2 right-2">
-            <CopyButton text={prompt.content} />
+        {showRichTabs ? (
+          <Tabs defaultValue="prompt" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="prompt">Prompt</TabsTrigger>
+              {hasTips && <TabsTrigger value="tips">Usage Tips</TabsTrigger>}
+              {hasExampleOutput && <TabsTrigger value="example">Example Output</TabsTrigger>}
+            </TabsList>
+            <TabsContent value="prompt" className="space-y-4">
+              {prompt.description && (
+                <p className="text-muted-foreground">{prompt.description}</p>
+              )}
+              <div className="rounded-lg border bg-muted/30 p-4 relative">
+                <div className="absolute top-2 right-2">
+                  <CopyButton text={prompt.content} />
+                </div>
+                <p className="whitespace-pre-wrap font-mono text-sm leading-relaxed pr-20">{prompt.content}</p>
+              </div>
+            </TabsContent>
+            {hasTips && (
+              <TabsContent value="tips">
+                <div className="rounded-lg border bg-muted/30 p-4">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed">{prompt.usage_tips}</p>
+                </div>
+              </TabsContent>
+            )}
+            {hasExampleOutput && (
+              <TabsContent value="example">
+                <div className="rounded-lg border bg-muted/30 p-4">
+                  <p className="whitespace-pre-wrap font-mono text-sm leading-relaxed">{prompt.example_output}</p>
+                </div>
+              </TabsContent>
+            )}
+          </Tabs>
+        ) : (
+          <div className="space-y-4">
+            {prompt.description && (
+              <p className="text-muted-foreground">{prompt.description}</p>
+            )}
+            <div className="rounded-lg border bg-muted/30 p-4 relative">
+              <div className="absolute top-2 right-2">
+                <CopyButton text={prompt.content} />
+              </div>
+              <p className="whitespace-pre-wrap font-mono text-sm leading-relaxed pr-20">{prompt.content}</p>
+            </div>
           </div>
-          <p className="whitespace-pre-wrap font-mono text-sm leading-relaxed pr-20">{prompt.content}</p>
-        </div>
+        )}
 
         <PromptVariables content={prompt.content} />
 

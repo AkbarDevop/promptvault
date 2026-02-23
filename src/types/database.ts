@@ -67,6 +67,8 @@ export interface Database {
           title: string
           content: string
           description: string | null
+          usage_tips: string | null
+          example_output: string | null
           model: AiModel
           category: PromptCategory
           tags: string[]
@@ -83,6 +85,8 @@ export interface Database {
           title: string
           content: string
           description?: string | null
+          usage_tips?: string | null
+          example_output?: string | null
           model?: AiModel
           category?: PromptCategory
           tags?: string[]
@@ -97,6 +101,8 @@ export interface Database {
           title?: string
           content?: string
           description?: string | null
+          usage_tips?: string | null
+          example_output?: string | null
           model?: AiModel
           category?: PromptCategory
           tags?: string[]

@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { Compass, Home, LogIn, PlusSquare, User, UserPlus, Bookmark } from 'lucide-react'
+import { UnreadNotificationsBadge } from '@/components/notifications/unread-notifications-badge'
+import { Compass, Home, LogIn, PlusSquare, User, UserPlus, Bookmark, Bell } from 'lucide-react'
 
 interface MobileBottomNavProps {
   isAuthenticated: boolean
@@ -15,6 +16,7 @@ type NavItem = {
   label: string
   icon: React.ComponentType<{ className?: string }>
   active: (pathname: string) => boolean
+  showUnreadBadge?: boolean
 }
 
 function navItemClass(isActive: boolean) {
@@ -32,6 +34,7 @@ export function MobileBottomNav({ isAuthenticated, username }: MobileBottomNavPr
     { href: '/feed', label: 'Feed', icon: Home, active: (p) => p.startsWith('/feed') },
     { href: '/explore', label: 'Explore', icon: Compass, active: (p) => p.startsWith('/explore') },
     { href: '/prompts/new', label: 'New', icon: PlusSquare, active: (p) => p === '/prompts/new' },
+    { href: '/notifications', label: 'Alerts', icon: Bell, active: (p) => p.startsWith('/notifications'), showUnreadBadge: true },
     { href: '/bookmarks', label: 'Saved', icon: Bookmark, active: (p) => p.startsWith('/bookmarks') },
     { href: profileHref, label: 'Profile', icon: User, active: (p) => p.startsWith('/profile') },
   ]
@@ -54,7 +57,12 @@ export function MobileBottomNav({ isAuthenticated, username }: MobileBottomNavPr
 
           return (
             <Link key={item.href} href={item.href} className={navItemClass(active)}>
-              <Icon className={cn('h-4 w-4', active && 'text-primary')} />
+              <div className="relative">
+                <Icon className={cn('h-4 w-4', active && 'text-primary')} />
+                {item.showUnreadBadge && (
+                  <UnreadNotificationsBadge className="absolute -right-2 -top-1 h-4 min-w-4 px-1 text-[9px]" />
+                )}
+              </div>
               <span className="truncate">{item.label}</span>
             </Link>
           )

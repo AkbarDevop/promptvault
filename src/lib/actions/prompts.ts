@@ -16,6 +16,8 @@ export async function createPrompt(_prevState: FormState, formData: FormData): P
     title: formData.get('title'),
     content: formData.get('content'),
     description: formData.get('description') || undefined,
+    usage_tips: formData.get('usage_tips') || undefined,
+    example_output: formData.get('example_output') || undefined,
     model: formData.get('model'),
     category: formData.get('category'),
     tags: (formData.get('tags') as string)
@@ -30,9 +32,16 @@ export async function createPrompt(_prevState: FormState, formData: FormData): P
     return { error: parsed.error.flatten().fieldErrors }
   }
 
+  const payload = {
+    ...parsed.data,
+    description: parsed.data.description?.trim() ? parsed.data.description : null,
+    usage_tips: parsed.data.usage_tips?.trim() ? parsed.data.usage_tips : null,
+    example_output: parsed.data.example_output?.trim() ? parsed.data.example_output : null,
+  }
+
   const { data, error } = await supabase
     .from('prompts')
-    .insert({ ...parsed.data, user_id: user.id })
+    .insert({ ...payload, user_id: user.id })
     .select('id')
     .single()
 
@@ -52,6 +61,8 @@ export async function updatePrompt(id: string, _prevState: FormState, formData: 
     title: formData.get('title'),
     content: formData.get('content'),
     description: formData.get('description') || undefined,
+    usage_tips: formData.get('usage_tips') || undefined,
+    example_output: formData.get('example_output') || undefined,
     model: formData.get('model'),
     category: formData.get('category'),
     tags: (formData.get('tags') as string)
@@ -66,9 +77,16 @@ export async function updatePrompt(id: string, _prevState: FormState, formData: 
     return { error: parsed.error.flatten().fieldErrors }
   }
 
+  const payload = {
+    ...parsed.data,
+    description: parsed.data.description?.trim() ? parsed.data.description : null,
+    usage_tips: parsed.data.usage_tips?.trim() ? parsed.data.usage_tips : null,
+    example_output: parsed.data.example_output?.trim() ? parsed.data.example_output : null,
+  }
+
   const { error } = await supabase
     .from('prompts')
-    .update(parsed.data)
+    .update(payload)
     .eq('id', id)
     .eq('user_id', user.id)
 

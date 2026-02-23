@@ -54,6 +54,8 @@ CREATE TABLE public.prompts (
   title         TEXT NOT NULL CHECK (char_length(title) BETWEEN 3 AND 120),
   content       TEXT NOT NULL CHECK (char_length(content) BETWEEN 10 AND 8000),
   description   TEXT CHECK (char_length(description) <= 500),
+  usage_tips    TEXT CHECK (char_length(usage_tips) <= 2000),
+  example_output TEXT CHECK (char_length(example_output) <= 2000),
   model         ai_model NOT NULL DEFAULT 'other',
   category      prompt_category NOT NULL DEFAULT 'other',
   tags          TEXT[] NOT NULL DEFAULT '{}' CHECK (array_length(tags, 1) <= 10),

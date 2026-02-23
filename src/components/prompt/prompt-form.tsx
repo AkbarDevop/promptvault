@@ -111,6 +111,34 @@ export function PromptForm({ action, prompt }: PromptFormProps) {
         />
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="usage_tips">Usage Tips <span className="text-muted-foreground">(optional)</span></Label>
+        <Textarea
+          id="usage_tips"
+          name="usage_tips"
+          placeholder="How to adapt this prompt, what to watch for, and best practices"
+          defaultValue={prompt?.usage_tips ?? ''}
+          rows={4}
+        />
+        {state?.error?.['usage_tips'] && (
+          <p className="text-xs text-destructive">{state.error['usage_tips']![0]}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="example_output">Example Output <span className="text-muted-foreground">(optional)</span></Label>
+        <Textarea
+          id="example_output"
+          name="example_output"
+          placeholder="Share a sample output so people understand the expected quality"
+          defaultValue={prompt?.example_output ?? ''}
+          rows={4}
+        />
+        {state?.error?.['example_output'] && (
+          <p className="text-xs text-destructive">{state.error['example_output']![0]}</p>
+        )}
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label>AI Model *</Label>

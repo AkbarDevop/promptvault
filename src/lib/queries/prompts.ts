@@ -4,7 +4,7 @@ import type { PromptCategory, PromptWithProfile } from '@/types/database'
 // Supabase requires the explicit FK hint because prompts has multiple
 // relationships to profiles (direct, via likes, via bookmarks)
 const PROMPT_WITH_PROFILE = `
-  id, title, content, description, model, category, tags,
+  id, title, content, description, usage_tips, example_output, model, category, tags,
   like_count, bookmark_count, created_at,
   profiles!prompts_user_id_fkey(username, display_name, avatar_url)
 ` as const
@@ -113,7 +113,7 @@ export async function getMyPrompts(userId: string): Promise<PromptWithProfile[]>
   const { data, error } = await supabase
     .from('prompts')
     .select(`
-      id, title, content, description, model, category, tags,
+      id, title, content, description, usage_tips, example_output, model, category, tags,
       is_public, like_count, bookmark_count, created_at,
       profiles!prompts_user_id_fkey(username, display_name, avatar_url)
     `)
@@ -175,7 +175,7 @@ export async function getBookmarkedPrompts(userId: string): Promise<PromptWithPr
     .select(
       `prompt_id,
        prompts!bookmarks_prompt_id_fkey(
-         id, title, description, model, category, tags,
+         id, title, description, usage_tips, example_output, model, category, tags,
          like_count, bookmark_count, created_at,
          profiles!prompts_user_id_fkey(username, display_name, avatar_url)
        )`

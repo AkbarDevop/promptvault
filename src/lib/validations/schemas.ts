@@ -19,6 +19,8 @@ export const promptSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(120, 'Title must be at most 120 characters'),
   content: z.string().min(10, 'Content must be at least 10 characters').max(8000, 'Content must be at most 8000 characters'),
   description: z.string().max(500, 'Description must be at most 500 characters').optional(),
+  usage_tips: z.string().max(2000, 'Usage tips must be at most 2000 characters').optional(),
+  example_output: z.string().max(2000, 'Example output must be at most 2000 characters').optional(),
   model: z.enum(['chatgpt', 'claude', 'gemini', 'grok', 'llama', 'mistral', 'other']),
   category: z.enum([
     'coding', 'writing', 'marketing', 'design', 'business',
