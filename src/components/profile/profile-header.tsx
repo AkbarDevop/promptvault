@@ -8,6 +8,8 @@ import type { Profile } from '@/types/database'
 interface ProfileHeaderProps {
   profile: Profile
   promptCount: number
+  followerCount: number
+  followingCount: number
   isOwner: boolean
   isAuthenticated: boolean
   isFollowing: boolean
@@ -16,6 +18,8 @@ interface ProfileHeaderProps {
 export function ProfileHeader({
   profile,
   promptCount,
+  followerCount,
+  followingCount,
   isOwner,
   isAuthenticated,
   isFollowing,
@@ -52,6 +56,12 @@ export function ProfileHeader({
           <span className="text-sm text-muted-foreground">
             <span className="font-semibold text-foreground">{promptCount}</span> prompts
           </span>
+          <a href="#followers" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <span className="font-semibold text-foreground">{followerCount}</span> followers
+          </a>
+          <a href="#following" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <span className="font-semibold text-foreground">{followingCount}</span> following
+          </a>
           {profile.website_url && (
             <a
               href={profile.website_url}

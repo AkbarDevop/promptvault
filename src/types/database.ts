@@ -233,6 +233,7 @@ export type Prompt = Database['public']['Tables']['prompts']['Row']
 export type Like = Database['public']['Tables']['likes']['Row']
 export type Bookmark = Database['public']['Tables']['bookmarks']['Row']
 export type Follow = Database['public']['Tables']['follows']['Row']
+export type ProfilePreview = Pick<Profile, 'id' | 'username' | 'display_name' | 'avatar_url'>
 
 export type PromptWithProfile = Prompt & {
   profiles: Pick<Profile, 'username' | 'display_name' | 'avatar_url'>
