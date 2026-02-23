@@ -2,15 +2,24 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Globe } from 'lucide-react'
 import Link from 'next/link'
+import { FollowButton } from '@/components/profile/follow-button'
 import type { Profile } from '@/types/database'
 
 interface ProfileHeaderProps {
   profile: Profile
   promptCount: number
   isOwner: boolean
+  isAuthenticated: boolean
+  isFollowing: boolean
 }
 
-export function ProfileHeader({ profile, promptCount, isOwner }: ProfileHeaderProps) {
+export function ProfileHeader({
+  profile,
+  promptCount,
+  isOwner,
+  isAuthenticated,
+  isFollowing,
+}: ProfileHeaderProps) {
   return (
     <div className="flex items-start gap-4">
       <Avatar className="h-16 w-16">
@@ -27,6 +36,14 @@ export function ProfileHeader({ profile, promptCount, isOwner }: ProfileHeaderPr
             <Button asChild variant="outline" size="sm">
               <Link href="/profile/settings">Edit profile</Link>
             </Button>
+          )}
+          {!isOwner && (
+            <FollowButton
+              profileId={profile.id}
+              profileUsername={profile.username}
+              initialFollowing={isFollowing}
+              isAuthenticated={isAuthenticated}
+            />
           )}
         </div>
         <p className="text-sm text-muted-foreground">@{profile.username}</p>

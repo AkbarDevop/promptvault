@@ -29,11 +29,13 @@ function isPromptCategory(value: string): value is PromptCategory {
 export async function getFeedPrompts({
   tab = 'latest',
   category,
+  viewerId,
   page = 0,
   limit = 20,
 }: {
-  tab?: 'latest' | 'trending'
+  tab?: 'latest' | 'trending' | 'following'
   category?: string
+  viewerId?: string
   page?: number
   limit?: number
 } = {}): Promise<PromptWithProfile[]> {
@@ -49,10 +51,28 @@ export async function getFeedPrompts({
     query = query.eq('category', category)
   }
 
-  query =
-    tab === 'trending'
-      ? query.order('like_count', { ascending: false })
-      : query.order('created_at', { ascending: false })
+  if (tab === 'following') {
+    if (!viewerId) return []
+
+    const { data: follows, error: followsError } = await supabase
+      .from('follows')
+      .select('followed_id')
+      .eq('follower_id', viewerId)
+
+    if (followsError) throw followsError
+
+    const followedIds = (follows ?? []).map((row) => row.followed_id)
+    if (!followedIds.length) return []
+
+    query = query
+      .in('user_id', followedIds)
+      .order('created_at', { ascending: false })
+  } else {
+    query =
+      tab === 'trending'
+        ? query.order('like_count', { ascending: false })
+        : query.order('created_at', { ascending: false })
+  }
 
   const { data, error } = await query
   if (error) throw error
