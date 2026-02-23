@@ -4,7 +4,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Search } from 'lucide-react'
-import { useTransition } from 'react'
+import { useEffect, useRef, useTransition } from 'react'
 
 interface ExploreFiltersProps {
   categories: string[]
@@ -17,6 +17,15 @@ export function ExploreFilters({ categories, currentCategory, currentQuery }: Ex
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [, startTransition] = useTransition()
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current)
+      }
+    }
+  }, [])
 
   function setParam(key: string, value: string | undefined) {
     const params = new URLSearchParams(searchParams.toString())
@@ -40,8 +49,10 @@ export function ExploreFilters({ categories, currentCategory, currentQuery }: Ex
           className="pl-9"
           onChange={(e) => {
             const val = e.target.value
-            clearTimeout((window as any).__searchTimeout)
-            ;(window as any).__searchTimeout = setTimeout(() => setParam('q', val), 400)
+            if (searchDebounceRef.current) {
+              clearTimeout(searchDebounceRef.current)
+            }
+            searchDebounceRef.current = setTimeout(() => setParam('q', val), 400)
           }}
         />
       </div>

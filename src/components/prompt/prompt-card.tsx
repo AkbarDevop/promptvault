@@ -27,7 +27,7 @@ interface PromptCardProps {
 }
 
 export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: PromptCardProps) {
-  const profile = prompt.profiles as any
+  const profile = prompt.profiles
 
   return (
     <Card className="flex flex-col hover:shadow-md transition-shadow relative group/card cursor-pointer">

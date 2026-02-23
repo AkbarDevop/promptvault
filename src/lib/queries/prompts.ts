@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import type { PromptWithProfile } from '@/types/database'
+import type { PromptCategory, PromptWithProfile } from '@/types/database'
 
 // Supabase requires the explicit FK hint because prompts has multiple
 // relationships to profiles (direct, via likes, via bookmarks)
@@ -8,6 +8,23 @@ const PROMPT_WITH_PROFILE = `
   like_count, bookmark_count, created_at,
   profiles!prompts_user_id_fkey(username, display_name, avatar_url)
 ` as const
+
+const PROMPT_CATEGORIES = [
+  'coding',
+  'writing',
+  'marketing',
+  'design',
+  'business',
+  'education',
+  'productivity',
+  'creative',
+  'research',
+  'other',
+] as const satisfies readonly PromptCategory[]
+
+function isPromptCategory(value: string): value is PromptCategory {
+  return PROMPT_CATEGORIES.includes(value as PromptCategory)
+}
 
 export async function getFeedPrompts({
   tab = 'latest',
@@ -28,8 +45,8 @@ export async function getFeedPrompts({
     .eq('is_public', true)
     .range(page * limit, (page + 1) * limit - 1)
 
-  if (category && category !== 'all') {
-    query = query.eq('category', category as any)
+  if (category && category !== 'all' && isPromptCategory(category)) {
+    query = query.eq('category', category)
   }
 
   query =
@@ -83,8 +100,8 @@ export async function searchPrompts(query: string, category?: string): Promise<P
     dbQuery = dbQuery.textSearch('title', query, { type: 'websearch' })
   }
 
-  if (category && category !== 'all') {
-    dbQuery = dbQuery.eq('category', category as any)
+  if (category && category !== 'all' && isPromptCategory(category)) {
+    dbQuery = dbQuery.eq('category', category)
   }
 
   const { data, error } = await dbQuery
@@ -109,7 +126,8 @@ export async function getBookmarkedPrompts(userId: string): Promise<PromptWithPr
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  return ((data ?? []).map((b: any) => b.prompts)) as unknown as PromptWithProfile[]
+  const rows = (data ?? []) as Array<{ prompts: PromptWithProfile | null }>
+  return rows.flatMap((bookmark) => (bookmark.prompts ? [bookmark.prompts] : []))
 }
 
 export async function getUserInteractions(userId: string, promptIds: string[]) {

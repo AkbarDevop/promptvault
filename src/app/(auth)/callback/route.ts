@@ -1,10 +1,19 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const DEFAULT_REDIRECT = '/feed'
+
+function getSafeRedirectPath(nextParam: string | null): string {
+  if (!nextParam) return DEFAULT_REDIRECT
+  if (!nextParam.startsWith('/')) return DEFAULT_REDIRECT
+  if (nextParam.startsWith('//')) return DEFAULT_REDIRECT
+  return nextParam
+}
+
 export async function GET(request: NextRequest) {
   const url = new URL(request.url)
   const code = url.searchParams.get('code')
-  const next = url.searchParams.get('next') ?? '/feed'
+  const next = getSafeRedirectPath(url.searchParams.get('next'))
 
   const redirectTo = new URL(next, request.url)
 

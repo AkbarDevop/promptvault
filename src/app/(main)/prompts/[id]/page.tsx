@@ -51,7 +51,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ i
     : { likes: new Set<string>(), bookmarks: new Set<string>() }
 
   const isOwner = user?.id === prompt.user_id
-  const profile = prompt.profiles as any
+  const profile = prompt.profiles
 
   // Fire-and-forget — don't block render, don't count owner views
   if (!isOwner) {
