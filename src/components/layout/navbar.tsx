@@ -12,7 +12,7 @@ import {
 import { signOut } from '@/lib/actions/auth'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav'
-import { Sparkles, Plus, Compass } from 'lucide-react'
+import { Sparkles, Plus, Compass, Users } from 'lucide-react'
 
 type NavProfile = { username: string; display_name: string | null; avatar_url: string | null }
 
@@ -44,6 +44,12 @@ export async function Navbar() {
               <Link href="/explore">
                 <Compass className="mr-1 h-4 w-4" />
                 Explore
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm" className="hidden sm:flex">
+              <Link href="/creators">
+                <Users className="mr-1 h-4 w-4" />
+                Creators
               </Link>
             </Button>
             <ThemeToggle />

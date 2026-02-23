@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Profile, ProfilePreview } from '@/types/database'
 
+export type CreatorRow = ProfilePreview & { follower_count: number; following_count: number; bio: string | null }
+
 export async function getProfileByUsername(username: string): Promise<Profile | null> {
   const supabase = await createClient()
 
@@ -53,6 +55,19 @@ export async function getFollowStats(userId: string): Promise<{ followers: numbe
     followers: followersResult.count ?? 0,
     following: followingResult.count ?? 0,
   }
+}
+
+export async function getTopCreators(limit = 20): Promise<CreatorRow[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, display_name, avatar_url, bio, follower_count, following_count')
+    .order('follower_count', { ascending: false })
+    .limit(limit)
+
+  if (error) return []
+  return (data ?? []) as unknown as CreatorRow[]
 }
 
 export async function getFollowers(userId: string, limit = 8): Promise<ProfilePreview[]> {

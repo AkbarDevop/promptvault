@@ -19,9 +19,23 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
   const profile = await getProfileByUsername(username)
   if (!profile) return { title: 'User Not Found — PromptVault' }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://promptvaultt.netlify.app'
+  const name = profile.display_name ?? profile.username
+  const ogUrl = `${siteUrl}/api/og?type=profile&name=${encodeURIComponent(name)}&username=${encodeURIComponent(profile.username)}&followers=${profile.follower_count}`
+
   return {
-    title: `${profile.display_name ?? profile.username} — PromptVault`,
+    title: `${name} — PromptVault`,
     description: profile.bio ?? `${profile.username}'s prompts on PromptVault`,
+    openGraph: {
+      title: `${name} on PromptVault`,
+      description: profile.bio ?? `Follow ${name} for the best AI prompts`,
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${name} on PromptVault`,
+      images: [ogUrl],
+    },
   }
 }
 
