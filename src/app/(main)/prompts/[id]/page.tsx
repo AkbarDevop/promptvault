@@ -31,9 +31,23 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const prompt = await getPromptById(id)
   if (!prompt) return { title: 'Prompt Not Found — PromptVault' }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://promptvaultt.netlify.app'
+  const author = prompt.profiles.display_name ?? prompt.profiles.username
+  const ogUrl = `${siteUrl}/api/og?type=prompt&title=${encodeURIComponent(prompt.title)}&author=${encodeURIComponent(author)}&category=${prompt.category}&model=${MODEL_LABELS[prompt.model] ?? prompt.model}`
+
   return {
     title: `${prompt.title} — PromptVault`,
     description: prompt.description ?? `A ${MODEL_LABELS[prompt.model]} prompt for ${prompt.category}`,
+    openGraph: {
+      title: prompt.title,
+      description: prompt.description ?? `A ${MODEL_LABELS[prompt.model]} prompt by ${author}`,
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: prompt.title,
+      images: [ogUrl],
+    },
   }
 }
 
