@@ -83,3 +83,30 @@ For each task, create a branch from origin/main named claude/<task-slug>.
 Before pushing: git fetch origin && git rebase origin/main && npm run lint.
 Push only your feature branch. Do not push directly to main.
 ```
+
+## 8) Message to give Codex agent
+
+Copy and send this:
+
+```text
+Use only /Users/akbar/Desktop/promptvault-codex for your work.
+Never edit /Users/akbar/Desktop/promptvault or /Users/akbar/Desktop/promptvault-claude.
+For each task, create a branch from origin/main named codex/<task-slug>.
+Before pushing: git fetch origin && git rebase origin/main && npm run lint.
+Push only your feature branch. Do not push directly to main.
+```
+
+## 9) Shared task handoff template (send to both agents)
+
+Use this exact format when starting a new task:
+
+```text
+Task: <one clear objective>
+Worktree: <agent-specific absolute path>
+Branch: <codex/... or claude/...>
+Scope: <explicit files or folders this agent owns>
+Do not touch: <files/folders owned by other agent>
+Quality gate: run npm run lint before push
+Git rule: fetch + rebase origin/main before push, no direct push to main
+Output: open a PR and include short test notes
+```
