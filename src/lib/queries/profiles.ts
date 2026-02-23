@@ -80,7 +80,7 @@ export async function getFollowers(userId: string, limit = 8): Promise<ProfilePr
     .order('created_at', { ascending: false })
     .limit(limit)
 
-  if (error) throw error
+  if (error) return []
 
   const rows = (data ?? []) as Array<{ follower: ProfilePreview | null }>
   return rows.flatMap((row) => (row.follower ? [row.follower] : []))
@@ -96,7 +96,7 @@ export async function getFollowing(userId: string, limit = 8): Promise<ProfilePr
     .order('created_at', { ascending: false })
     .limit(limit)
 
-  if (error) throw error
+  if (error) return []
 
   const rows = (data ?? []) as Array<{ followed: ProfilePreview | null }>
   return rows.flatMap((row) => (row.followed ? [row.followed] : []))

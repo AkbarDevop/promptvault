@@ -3,8 +3,10 @@ import type { PromptCategory, PromptWithProfile } from '@/types/database'
 
 // Supabase requires the explicit FK hint because prompts has multiple
 // relationships to profiles (direct, via likes, via bookmarks)
+// Note: usage_tips / example_output are intentionally omitted here — they are
+// only needed on the detail page (getPromptById uses SELECT *).
 const PROMPT_WITH_PROFILE = `
-  id, title, content, description, usage_tips, example_output, model, category, tags,
+  id, title, content, description, model, category, tags,
   like_count, bookmark_count, created_at,
   profiles!prompts_user_id_fkey(username, display_name, avatar_url)
 ` as const
@@ -59,7 +61,7 @@ export async function getFeedPrompts({
       .select('followed_id')
       .eq('follower_id', viewerId)
 
-    if (followsError) throw followsError
+    if (followsError) return []
 
     const followedIds = (follows ?? []).map((row) => row.followed_id)
     if (!followedIds.length) return []
@@ -75,7 +77,7 @@ export async function getFeedPrompts({
   }
 
   const { data, error } = await query
-  if (error) throw error
+  if (error) return []
   return (data ?? []) as unknown as PromptWithProfile[]
 }
 
@@ -102,7 +104,7 @@ export async function getUserPrompts(userId: string): Promise<PromptWithProfile[
     .eq('is_public', true)
     .order('created_at', { ascending: false })
 
-  if (error) throw error
+  if (error) return []
   return (data ?? []) as unknown as PromptWithProfile[]
 }
 
@@ -113,14 +115,14 @@ export async function getMyPrompts(userId: string): Promise<PromptWithProfile[]>
   const { data, error } = await supabase
     .from('prompts')
     .select(`
-      id, title, content, description, usage_tips, example_output, model, category, tags,
+      id, title, content, description, model, category, tags,
       is_public, like_count, bookmark_count, created_at,
       profiles!prompts_user_id_fkey(username, display_name, avatar_url)
     `)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
-  if (error) throw error
+  if (error) return []
   return (data ?? []) as unknown as PromptWithProfile[]
 }
 
@@ -163,7 +165,7 @@ export async function searchPrompts(
   }
 
   const { data, error } = await dbQuery
-  if (error) throw error
+  if (error) return []
   return (data ?? []) as unknown as PromptWithProfile[]
 }
 
@@ -175,7 +177,7 @@ export async function getBookmarkedPrompts(userId: string): Promise<PromptWithPr
     .select(
       `prompt_id,
        prompts!bookmarks_prompt_id_fkey(
-         id, title, description, usage_tips, example_output, model, category, tags,
+         id, title, description, model, category, tags,
          like_count, bookmark_count, created_at,
          profiles!prompts_user_id_fkey(username, display_name, avatar_url)
        )`
@@ -183,7 +185,7 @@ export async function getBookmarkedPrompts(userId: string): Promise<PromptWithPr
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
-  if (error) throw error
+  if (error) return []
   const rows = (data ?? []) as unknown as Array<{ prompts: PromptWithProfile | null }>
   return rows.flatMap((bookmark) => (bookmark.prompts ? [bookmark.prompts] : []))
 }
