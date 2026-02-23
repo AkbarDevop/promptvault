@@ -6,14 +6,32 @@ import { Badge } from '@/components/ui/badge'
 import { Search, X } from 'lucide-react'
 import { useEffect, useRef, useTransition } from 'react'
 
+const MODELS = [
+  { value: 'all',     label: 'All models' },
+  { value: 'claude',  label: 'Claude' },
+  { value: 'chatgpt', label: 'ChatGPT' },
+  { value: 'gemini',  label: 'Gemini' },
+  { value: 'grok',    label: 'Grok' },
+  { value: 'llama',   label: 'Llama' },
+  { value: 'mistral', label: 'Mistral' },
+  { value: 'other',   label: 'Other' },
+]
+
 interface ExploreFiltersProps {
   categories: string[]
   currentCategory?: string
   currentQuery?: string
   currentTag?: string
+  currentModel?: string
 }
 
-export function ExploreFilters({ categories, currentCategory, currentQuery, currentTag }: ExploreFiltersProps) {
+export function ExploreFilters({
+  categories,
+  currentCategory,
+  currentQuery,
+  currentTag,
+  currentModel,
+}: ExploreFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -79,6 +97,7 @@ export function ExploreFilters({ categories, currentCategory, currentQuery, curr
         </div>
       )}
 
+      {/* Category filter */}
       <div className="flex flex-wrap gap-2">
         {categories.map((cat) => {
           const isActive = (currentCategory ?? 'all') === cat
@@ -90,6 +109,23 @@ export function ExploreFilters({ categories, currentCategory, currentQuery, curr
               onClick={() => setParam('category', cat)}
             >
               {cat}
+            </Badge>
+          )
+        })}
+      </div>
+
+      {/* Model filter */}
+      <div className="flex flex-wrap gap-2">
+        {MODELS.map(({ value, label }) => {
+          const isActive = (currentModel ?? 'all') === value
+          return (
+            <Badge
+              key={value}
+              variant={isActive ? 'default' : 'outline'}
+              className="cursor-pointer"
+              onClick={() => setParam('model', value)}
+            >
+              {label}
             </Badge>
           )
         })}
