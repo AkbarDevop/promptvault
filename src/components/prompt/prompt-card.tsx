@@ -30,15 +30,16 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
   const profile = prompt.profiles as any
 
   return (
-    <Card className="flex flex-col hover:shadow-md transition-shadow">
+    <Card className="flex flex-col hover:shadow-md transition-shadow relative group/card cursor-pointer">
+      {/* Invisible full-card link — sits behind all interactive elements */}
+      <Link href={`/prompts/${prompt.id}`} className="absolute inset-0 z-0" aria-label={prompt.title} />
+
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
-          <Link href={`/prompts/${prompt.id}`} className="flex-1 group">
-            <h2 className="font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
-              {prompt.title}
-            </h2>
-          </Link>
-          <Badge variant="outline" className="shrink-0 text-xs">
+          <h2 className="font-semibold leading-snug group-hover/card:text-primary transition-colors line-clamp-2 flex-1">
+            {prompt.title}
+          </h2>
+          <Badge variant="outline" className="shrink-0 text-xs relative z-10">
             {MODEL_LABELS[prompt.model] ?? prompt.model}
           </Badge>
         </div>
@@ -52,12 +53,12 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
           <p className="text-sm font-mono leading-relaxed line-clamp-4 whitespace-pre-wrap">
             {prompt.content}
           </p>
-          <div className="absolute top-1 right-1 opacity-0 group-hover/content:opacity-100 transition-opacity">
+          <div className="absolute top-1 right-1 opacity-0 group-hover/content:opacity-100 transition-opacity z-10">
             <CopyButton text={prompt.content} />
           </div>
         </div>
         {prompt.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-3">
+          <div className="flex flex-wrap gap-1 mt-3 relative z-10">
             {prompt.tags.slice(0, 4).map((tag) => (
               <TagBadge key={tag} tag={tag} />
             ))}
@@ -66,14 +67,14 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
       </CardContent>
 
       <CardFooter className="pt-0 flex items-center justify-between">
-        <Link href={`/profile/${profile.username}`} className="flex items-center gap-2 group">
+        <Link href={`/profile/${profile.username}`} className="flex items-center gap-2 group/author relative z-10">
           <Avatar className="h-6 w-6">
             <AvatarImage src={profile.avatar_url ?? undefined} />
             <AvatarFallback className="text-xs">
               {(profile.display_name ?? profile.username ?? 'U')[0].toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+          <span className="text-xs text-muted-foreground group-hover/author:text-foreground transition-colors">
             {profile.display_name ?? profile.username}
           </span>
           <span className="text-xs text-muted-foreground">·</span>
@@ -82,7 +83,7 @@ export function PromptCard({ prompt, isLiked, isBookmarked, isAuthenticated }: P
           </span>
         </Link>
 
-        <div className="flex items-center">
+        <div className="flex items-center relative z-10">
           <LikeButton
             promptId={prompt.id}
             initialLiked={isLiked}
