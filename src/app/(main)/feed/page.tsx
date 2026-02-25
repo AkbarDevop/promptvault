@@ -2,10 +2,14 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getFeedPrompts, getUserInteractions } from '@/lib/queries/prompts'
+import { getTopCreators, getFollowing } from '@/lib/queries/profiles'
 import { PromptGrid } from '@/components/prompt/prompt-grid'
 import { FeedTabs } from '@/components/feed/feed-tabs'
+import { FollowButton } from '@/components/profile/follow-button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Users } from 'lucide-react'
 
 export const metadata = { title: 'Feed — PromptVault' }
 
@@ -25,6 +29,62 @@ function FeedSkeleton() {
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+async function FollowingSuggestions({ userId }: { userId: string }) {
+  const [topCreators, following] = await Promise.all([
+    getTopCreators(12),
+    getFollowing(userId, 100),
+  ])
+
+  const followingIds = new Set(following.map((f) => f.id))
+  const suggestions = topCreators
+    .filter((c) => c.id !== userId && !followingIds.has(c.id))
+    .slice(0, 6)
+
+  if (suggestions.length === 0) return null
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Users className="h-4 w-4 text-muted-foreground" />
+        <h3 className="font-semibold">Suggested creators to follow</h3>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {suggestions.map((creator) => (
+          <div key={creator.id} className="flex items-center gap-3 rounded-xl border bg-card p-4">
+            <Link href={`/profile/${creator.username}`} className="shrink-0">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={creator.avatar_url ?? undefined} />
+                <AvatarFallback className="text-sm font-semibold">
+                  {(creator.display_name ?? creator.username ?? 'U')[0].toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+            <div className="flex-1 min-w-0">
+              <Link href={`/profile/${creator.username}`} className="hover:text-primary transition-colors">
+                <p className="text-sm font-semibold truncate">{creator.display_name ?? creator.username}</p>
+                <p className="text-xs text-muted-foreground">
+                  {creator.follower_count.toLocaleString()} follower{creator.follower_count !== 1 ? 's' : ''}
+                </p>
+              </Link>
+            </div>
+            <FollowButton
+              profileId={creator.id}
+              profileUsername={creator.username}
+              initialFollowing={false}
+              isAuthenticated={true}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="text-center">
+        <Button asChild variant="outline" size="sm">
+          <Link href="/creators">Browse all creators</Link>
+        </Button>
+      </div>
     </div>
   )
 }
@@ -53,7 +113,6 @@ async function FeedContent({
     )
   }
 
-  // Fetch all prompts up to current page so Server Component can render them
   const prompts = await getFeedPrompts({
     tab,
     category,
@@ -61,6 +120,23 @@ async function FeedContent({
     limit: PAGE_SIZE * (page + 1),
     page: 0,
   })
+
+  // Following tab with no results — show creator suggestions instead of dead-end
+  if (tab === 'following' && prompts.length === 0 && userId) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-lg border border-dashed p-8 text-center space-y-2">
+          <h2 className="text-lg font-semibold">Your Following feed is empty</h2>
+          <p className="text-sm text-muted-foreground">
+            Follow some creators below to see their latest prompts here.
+          </p>
+        </div>
+        <Suspense>
+          <FollowingSuggestions userId={userId} />
+        </Suspense>
+      </div>
+    )
+  }
 
   const promptIds = prompts.map((p) => p.id)
   const { likes, bookmarks } = userId
@@ -82,11 +158,7 @@ async function FeedContent({
         likedIds={likes}
         bookmarkedIds={bookmarks}
         isAuthenticated={!!userId}
-        emptyMessage={
-          tab === 'following'
-            ? 'No prompts from people you follow yet. Follow more creators to personalize your feed.'
-            : 'No prompts yet. Be the first to share one!'
-        }
+        emptyMessage="No prompts yet. Be the first to share one!"
       />
       {hasMore && (
         <div className="flex justify-center pt-2">
