@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ fontSize: 24, color: accent }}>✦</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: white, letterSpacing: '-0.5px' }}>PromptVault</div>
+            <div style={{ fontSize: 12, color: muted, marginLeft: 8 }}>The Permanent Archive</div>
           </div>
 
           {/* Profile block */}
@@ -125,6 +126,7 @@ export async function GET(req: NextRequest) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ fontSize: 24, color: accent }}>✦</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: white, letterSpacing: '-0.5px' }}>PromptVault</div>
+            <div style={{ fontSize: 12, color: muted, marginLeft: 8 }}>The Permanent Archive</div>
           </div>
           {category && (
             <div
