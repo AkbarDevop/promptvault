@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Users } from 'lucide-react'
 
-export const metadata = { title: 'Feed — PromptVault' }
+export const metadata = { title: 'Feed — PromptVault: The Permanent Archive' }
 
 const PAGE_SIZE = 20
 
@@ -193,8 +193,8 @@ export default async function FeedPage({
       <div className="rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 border border-primary/10">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-2xl font-bold">Discover Prompts</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">Browse the best prompts for Claude, ChatGPT, Gemini &amp; more</p>
+            <h1 className="text-2xl font-bold">The Archive</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Prompts worth preserving — for Claude, ChatGPT, Gemini &amp; more</p>
           </div>
           <Suspense>
             <FeedTabs isAuthenticated={!!user} />

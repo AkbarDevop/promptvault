@@ -7,9 +7,9 @@ import { Toaster } from '@/components/ui/sonner'
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' })
 
 export const metadata: Metadata = {
-  title: 'PromptVault — Share and Discover AI Prompts',
+  title: 'PromptVault — The Permanent Archive for AI Prompts',
   description:
-    'The social platform for AI prompt art. Share your best ChatGPT, Claude, and Gemini interactions. Discover how others use AI creatively.',
+    'The right prompt can change everything. PromptVault is the permanent archive where the best prompts for Claude, ChatGPT, and Gemini are preserved, shared, and remembered forever.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
